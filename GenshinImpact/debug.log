@@ -1,0 +1,8 @@
+[0322/170537.594:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is 
+[0322/170851.795:WARNING:spdy_session.cc(3487)] Received HEADERS for invalid stream 1
+[0322/201003.714:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.
+[0322/201003.813:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.
+[0322/201003.828:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.
+[0322/201003.941:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.
+[0322/201003.948:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.
+[0322/201330.110:WARNING:dns_config_service_win.cc(583)] Failed to read DnsConfig.

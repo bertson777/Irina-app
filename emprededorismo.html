@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTOEMPREGO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(255,165,0,0.15);
+    --accent: #ff9500;
+    --accent2: #ff4d00;
+    --accent3: #ffcc00;
+    --text: #f0ede8;
+    --text-muted: #7a7890;
+    --card-bg: #16161f;
+    --glow: rgba(255,149,0,0.3);
+    --tab-active: #ff9500;
+    --shadow: 0 0 40px rgba(255,149,0,0.15);
+  }
+  [data-theme="light"] {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: rgba(200,100,0,0.2);
+    --accent: #d4690a;
+    --accent2: #e84000;
+    --accent3: #c49a00;
+    --text: #1a1510;
+    --text-muted: #7a6a55;
+    --card-bg: #ffffff;
+    --glow: rgba(212,105,10,0.2);
+    --tab-active: #d4690a;
+    --shadow: 0 0 40px rgba(212,105,10,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  /* ANIMATED BG */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+    animation: gridMove 20s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    animation: orbPulse 6s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 400px; height: 400px; background: rgba(255,149,0,0.08); top: -100px; right: -100px; }
+  .orb2 { width: 300px; height: 300px; background: rgba(255,77,0,0.06); bottom: 100px; left: -100px; animation-delay: -3s; }
+  @keyframes orbPulse {
+    from { transform: scale(1) rotate(0deg); opacity: 0.5; }
+    to { transform: scale(1.3) rotate(20deg); opacity: 1; }
+  }
+
+  /* WRAPPER */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0 10px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    position: relative;
+  }
+  .logo::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 100%; height: 1px;
+    background: var(--accent);
+    animation: blink 2s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* THEME TOGGLE */
+  .theme-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .theme-btn:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--glow);
+    transform: scale(1.05);
+  }
+  .theme-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: relative;
+    transition: all 0.4s;
+    flex-shrink: 0;
+  }
+  [data-theme="dark"] .theme-icon::after {
+    content: '🌙'; font-size: 12px;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    background: transparent;
+  }
+  [data-theme="light"] .theme-icon::after {
+    content: '☀️'; font-size: 12px;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+  /* TITLE SECTION */
+  .title-section {
+    text-align: center;
+    padding: 40px 0 20px;
+  }
+  .main-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titlePop 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes titlePop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .title-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    margin-top: 8px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* TABS */
+  .tabs-container {
+    display: flex;
+    gap: 12px;
+    margin: 30px 0 0;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 18px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .tab-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .tab-btn.active {
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    transform: translateY(-3px);
+  }
+  .tab-btn.active::before { opacity: 1; }
+  .tab-btn span { position: relative; z-index: 1; }
+  .tab-btn .tab-num {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-bottom: 5px;
+  }
+  .tab-btn:hover:not(.active) {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* CONTENT PANELS */
+  .panel {
+    display: none;
+    animation: panelIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .panel.active { display: block; }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* PANEL 1 - O QUE É */
+  .definition-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .definition-box::before {
+    content: '"';
+    font-family: 'Syne', sans-serif;
+    font-size: 120px;
+    color: var(--accent);
+    opacity: 0.07;
+    position: absolute;
+    top: -10px; left: 20px;
+    line-height: 1;
+  }
+  .definition-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .definition-text {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text);
+    font-weight: 300;
+  }
+  .definition-text strong {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* EXAMPLES GRID */
+  .examples-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    margin: 32px 0 14px;
+    text-transform: uppercase;
+  }
+  .examples-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 500px) { .examples-grid { grid-template-columns: 1fr; } }
+
+  .example-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    cursor: default;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .example-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 0;
+  }
+  .example-card:hover {
+    transform: scale(1.04) translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 35px var(--glow);
+  }
+  .example-card:hover::after { opacity: 0.08; }
+  .example-card-inner { position: relative; z-index: 1; }
+  .example-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .example-card:hover .example-icon { transform: scale(1.3) rotate(-5deg); }
+  .example-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .example-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.4s;
+    opacity: 0;
+  }
+  .example-card:hover .example-detail {
+    max-height: 100px;
+    opacity: 1;
+  }
+
+  /* SUMMARY */
+  .summary-box {
+    margin-top: 28px;
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+  }
+  .summary-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .summary-text span {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* PANEL 2 - COMO CRIAR */
+  .steps-wrapper {
+    margin-top: 24px;
+    position: relative;
+  }
+  .steps-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .step-dots {
+    display: flex;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.4);
+    box-shadow: 0 0 8px var(--glow);
+  }
+
+  .step-arrow {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    color: var(--text-muted);
+    user-select: none;
+  }
+  .step-arrow:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--glow);
+  }
+  .step-arrow:active { transform: scale(0.9); }
+
+  .step-track {
+    overflow: hidden;
+    border-radius: 20px;
+    position: relative;
+  }
+  .step-slide {
+    display: none;
+    animation: slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .step-slide.active { display: block; }
+  .step-slide.slide-left { animation: slideInLeft 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .step-slide.slide-right { animation: slideInRight 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-60px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(60px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .step-bg-num {
+    position: absolute;
+    right: -10px; top: -20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 140px;
+    font-weight: 800;
+    color: var(--accent);
+    opacity: 0.04;
+    line-height: 1;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .step-card:hover .step-bg-num { opacity: 0.08; }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    padding: 5px 14px;
+    border-radius: 50px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    width: fit-content;
+    box-shadow: 0 4px 15px var(--glow);
+  }
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .step-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    font-weight: 300;
+    flex: 1;
+  }
+  .step-desc strong { color: var(--accent); font-weight: 600; }
+
+  .step-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+  .step-hint-icon { font-size: 14px; animation: pulse 2s ease infinite; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  /* SWIPE HINT */
+  .swipe-hint {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-top: 12px;
+    animation: swipeAnim 2s ease-in-out infinite;
+  }
+  @keyframes swipeAnim {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* BERTSON PLAN */
+  .plan-section {
+    margin-top: 36px;
+    position: relative;
+  }
+  .plan-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .plan-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .plan-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 4px 0 0 4px;
+  }
+  .plan-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .plan-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+  .plan-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .plan-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .plan-item:hover {
+    border-color: var(--accent);
+    transform: translateX(6px);
+  }
+  .plan-item-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .plan-item-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .plan-item-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+    position: relative;
+  }
+  .divider::after {
+    content: '◆';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent);
+    background: var(--bg);
+    padding: 0 12px;
+    font-size: 10px;
+    transition: background 0.4s;
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<div class="wrapper">
+  <header>
+    <div class="logo">BX_AUTOEMPREGO</div>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <div class="theme-icon"></div>
+      <span id="theme-label">ESCURO</span>
+    </button>
+  </header>
+
+  <div class="title-section">
+    <h1 class="main-title">AUTOEMPREGO</h1>
+    <p class="title-sub">SER O SEU PRÓPRIO PATRÃO</p>
+  </div>
+
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab(0)" id="tab0">
+      <span>
+        <span class="tab-num">01 —</span>
+        O QUE É?
+      </span>
+    </button>
+    <button class="tab-btn" onclick="switchTab(1)" id="tab1">
+      <span>
+        <span class="tab-num">02 —</span>
+        COMO CRIAR?
+      </span>
+    </button>
+  </div>
+
+  <!-- PANEL 1 -->
+  <div class="panel active" id="panel0">
+    <div class="definition-box">
+      <div class="definition-label">// DEFINIÇÃO</div>
+      <p class="definition-text">
+        <strong>Autoemprego</strong> é quando tu és o teu próprio patrão — trabalhas por conta própria, 
+        sem estar contratado por uma empresa. Em vez de receber salário de alguém, 
+        tu próprio <strong>geras renda</strong> com as tuas habilidades ou negócio.
+      </p>
+    </div>
+
+    <div class="examples-label">// EXEMPLOS — passe o mouse para ver mais</div>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="example-card-inner">
+          <span class="example-icon">💻</span>
+          <div class="example-title">Freelancer Digital</div>
+          <div class="example-detail">Design, programação, tradução, edição de vídeo. Trabalhas para vários clientes online, sem vínculo fixo. Tu defines o preço e os horários.</div>
+        </div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-inner">
+          <span class="example-icon">🛒</span>
+          <div class="example-title">Venda Online</div>
+          <div class="example-detail">Vender produtos físicos ou digitais via redes sociais, marketplaces ou loja própria. Baixo custo inicial, alcance alto.</div>
+        </div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-inner">
+          <span class="example-icon">🍽️</span>
+          <div class="example-title">Pequeno Negócio</div>
+          <div class="example-detail">Barbearia, barraca de comida, padaria caseira. Negócio local com clientes fixos, muito comum em Mosteiros e outras cidades pequenas.</div>
+        </div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-inner">
+          <span class="example-icon">🔧</span>
+          <div class="example-title">Prestação de Serviços</div>
+          <div class="example-detail">Reparações, aulas particulares, transporte, limpeza. Vendes o teu tempo e competência diretamente para quem precisa.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-box">
+      <p class="summary-text">
+        Em síntese — tu és o <span>empregado</span> e o <span>empregador</span> ao mesmo tempo.<br>
+        O lucro é teu. O risco também. A <span>liberdade</span>, igualmente.
+      </p>
+    </div>
+  </div>
+
+  <!-- PANEL 2 -->
+  <div class="panel" id="panel1">
+    <div class="steps-wrapper">
+      <div class="steps-nav">
+        <div class="step-arrow" onclick="prevStep()">←</div>
+        <div class="step-dots" id="dots"></div>
+        <div class="step-arrow" onclick="nextStep()">→</div>
+      </div>
+
+      <div class="step-track">
+        <div class="step-slide active" id="step0">
+          <div class="step-card">
+            <div class="step-bg-num">1</div>
+            <div class="step-badge">Passo 01</div>
+            <div class="step-title">Identifica o que tens para oferecer</div>
+            <p class="step-desc">
+              Habilidade, produto, ou serviço. <strong>Sabes programar?</strong> Desenhar? 
+              Cozinhar? Reparar coisas? O ponto de partida é sempre o que já existe dentro de ti — 
+              não o que precisas comprar ou aprender do zero.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">⚡</span>
+              <span>A habilidade já existe — só precisas reconhecê-la</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-slide" id="step1">
+          <div class="step-card">
+            <div class="step-bg-num">2</div>
+            <div class="step-badge">Passo 02</div>
+            <div class="step-title">Define o teu público</div>
+            <p class="step-desc">
+              <strong>Quem vai pagar?</strong> Pessoas, empresas, vizinhos, online? 
+              Quanto mais específico for o teu target, mais fácil é chegar a ele. 
+              Não tentes servir toda a gente ao mesmo tempo.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">🎯</span>
+              <span>Nicho pequeno → resultado grande</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-slide" id="step2">
+          <div class="step-card">
+            <div class="step-bg-num">3</div>
+            <div class="step-badge">Passo 03</div>
+            <div class="step-title">Começa pequeno, agora</div>
+            <p class="step-desc">
+              Não precisas de capital grande no início. Muitos autoempregados começam 
+              <strong>com zero</strong> — só tempo e habilidade. Não esperes condições perfeitas: 
+              elas nunca chegam. A ação cria as condições.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">🚀</span>
+              <span>Feito é melhor do que perfeito</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-slide" id="step3">
+          <div class="step-card">
+            <div class="step-bg-num">4</div>
+            <div class="step-badge">Passo 04</div>
+            <div class="step-title">Divulga o teu trabalho</div>
+            <p class="step-desc">
+              WhatsApp, redes sociais, boca a boca. <strong>Em Mosteiros</strong>, 
+              o boca a boca ainda é o canal mais forte. Mas o digital abre portas 
+              que o local não alcança. Usa os dois em paralelo.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">📡</span>
+              <span>Visibilidade = oportunidade</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-slide" id="step4">
+          <div class="step-card">
+            <div class="step-bg-num">5</div>
+            <div class="step-badge">Passo 05</div>
+            <div class="step-title">Cobra pelo teu trabalho</div>
+            <p class="step-desc">
+              Muita gente trava aqui. <strong>Define um preço justo</strong> e mantém — 
+              cobrar não é arrogância, é respeito pelo teu tempo e habilidade. 
+              Grátis não paga conta, não sustenta negócio.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">💰</span>
+              <span>O teu tempo tem valor — cobra por ele</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-slide" id="step5">
+          <div class="step-card">
+            <div class="step-bg-num">6</div>
+            <div class="step-badge">Passo 06</div>
+            <div class="step-title">Reinveste e cresce</div>
+            <p class="step-desc">
+              O que ganhas, <strong>parte volta pro negócio</strong>. Ferramentas melhores, 
+              mais divulgação, novos aprendizados. O crescimento não é acidente — 
+              é resultado de reinvestimento constante e disciplina.
+            </p>
+            <div class="step-hint">
+              <span class="step-hint-icon">📈</span>
+              <span>Negócio vivo cresce com quem o alimenta</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-hint">← USE AS SETAS PARA NAVEGAR →</div>
+    </div>
+
+    <div class="plan-section">
+      <div class="plan-label">// MEU PLANO DE AUTOEMPREGO</div>
+      <div class="plan-card">
+        <div class="plan-name">BERTSON · Mosteiros, Fogo</div>
+        <div class="plan-sub">STACK: desenvolvimento · design · jogos · tecnologia</div>
+        <div class="plan-items">
+          <div class="plan-item">
+            <div class="plan-item-icon">🎮</div>
+            <div>
+              <div class="plan-item-title">KOJIRA — Desenvolvimento de Jogo</div>
+              <div class="plan-item-desc">RPG original com lore próprio. A longo prazo gera renda via venda do jogo, assets e monetização in-game.</div>
+            </div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-item-icon">🍕</div>
+            <div>
+              <div class="plan-item-title">irina — App de Delivery</div>
+              <div class="plan-item-desc">Plataforma de entrega de comida para Mosteiros. Backend Node.js/Firebase, integração VINTI4 e Google Maps.</div>
+            </div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-item-icon">💻</div>
+            <div>
+              <div class="plan-item-title">Freelance em Desenvolvimento Web</div>
+              <div class="plan-item-desc">Criação de sites, apps simples e protótipos para clientes locais e online. Renda imediata com as habilidades que já tens.</div>
+            </div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-item-icon">📚</div>
+            <div>
+              <div class="plan-item-title">Ensino de Tecnologia</div>
+              <div class="plan-item-desc">Aulas básicas de programação, informática e segurança digital na região. Alto impacto local, baixo custo de entrada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // THEME
+  function toggleTheme() {
+    const html = document.documentElement;
+    const label = document.getElementById('theme-label');
+    if (html.dataset.theme === 'dark') {
+      html.dataset.theme = 'light';
+      label.textContent = 'CLARO';
+    } else {
+      html.dataset.theme = 'dark';
+      label.textContent = 'ESCURO';
+    }
+  }
+
+  // TABS
+  function switchTab(idx) {
+    document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+    document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  }
+
+  // STEPS
+  const TOTAL_STEPS = 6;
+  let currentStep = 0;
+
+  function buildDots() {
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    for (let i = 0; i < TOTAL_STEPS; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.onclick = () => goToStep(i, i > currentStep ? 'right' : 'left');
+      dots.appendChild(d);
+    }
+  }
+
+  function goToStep(idx, dir) {
+    if (idx === currentStep) return;
+    const prev = document.getElementById('step' + currentStep);
+    const next = document.getElementById('step' + idx);
+    prev.classList.remove('active');
+    next.classList.remove('slide-left', 'slide-right');
+    void next.offsetWidth;
+    next.classList.add(dir === 'right' ? 'slide-right' : 'slide-left');
+    next.classList.add('active');
+    currentStep = idx;
+    document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  }
+
+  function nextStep() {
+    if (currentStep < TOTAL_STEPS - 1) goToStep(currentStep + 1, 'right');
+    else goToStep(0, 'left');
+  }
+  function prevStep() {
+    if (currentStep > 0) goToStep(currentStep - 1, 'left');
+    else goToStep(TOTAL_STEPS - 1, 'right');
+  }
+
+  // KEYBOARD NAV
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('panel1').classList.contains('active')) {
+      if (e.key === 'ArrowRight') nextStep();
+      if (e.key === 'ArrowLeft') prevStep();
+    }
+  });
+
+  // TOUCH/SWIPE
+  let touchStartX = 0;
+  document.getElementById('panel1').addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  });
+  document.getElementById('panel1').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) dx < 0 ? nextStep() : prevStep();
+  });
+
+  buildDots();
+</script>
+</body>
+</html>
